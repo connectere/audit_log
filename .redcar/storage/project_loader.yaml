@@ -1,0 +1,7 @@
+--- 
+open_files: 
+  - spec/dummy/spec/observer_spec.rb
+  - lib/audit_log/observer.rb
+  - lib/audit_log/logged_model.rb
+  - audit_log.gemspec
+  - lib/audit_log/version.rb
