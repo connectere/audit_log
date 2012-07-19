@@ -1,8 +1,11 @@
 class AuditedModelsObserver < ActiveRecord::Observer
 
+  attr_accessor :controller
+  
   def self.observed_classes
     AuditLog::Mapping.instance.audit_mappings.keys.collect{|model_as_symbol| model_as_symbol.to_s.camelize.constantize}
   end
+  
   
   def before_validation(model)
     Thread.current[:auditing] ||= model
@@ -11,7 +14,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
   def after_create(model)
     if Thread.current[:auditing] == model
       logged_model = LoggedModel.new(
-        who: AuditLog::CurrentThread.who,
+        who: self.controller.current_user_for_audit_log,
         what: {id: model.id, event: :create},
         model_name: model.class.name,
         model_id: model.id
@@ -26,7 +29,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
     
     if Thread.current[:auditing] == model
       logged_model = LoggedModel.new(
-        who: AuditLog::CurrentThread.who,
+        who: self.controller.current_user_for_audit_log,
         what: {id: model.id, event: :destroy},
         model_name: model.class.name,
         model_id: model.id
@@ -43,7 +46,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
         what = WhatBuilder.new(changes).build
         
         logged_model = LoggedModel.new(
-          who: AuditLog::CurrentThread.who,
+          who: self.controller.current_user_for_audit_log,
           what: what,
           model_name: model.class.name,
           model_id: model.id
@@ -198,4 +201,27 @@ class AuditedModelsObserver < ActiveRecord::Observer
     end
   end
   
+end
+
+require 'singleton'
+
+class Teste
+  include Singleton
+  
+  def before(controller)
+    AuditedModelsObserver.instance.controller = controller
+    true
+  end
+  
+  def after(controller)
+    AuditedModelsObserver.instance.controller = nil
+  end
+end
+
+
+
+if defined?(ActionController) and defined?(ActionController::Base)
+  ActionController::Base.class_eval do
+    around_filter Teste.instance
+  end
 end
