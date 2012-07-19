@@ -14,7 +14,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
   def after_create(model)
     if self.controller.audited_model == model
       logged_model = LoggedModel.new(
-        who: self.controller.current_user_for_audit_log,
+        who: self.controller.current_user_for_audit_log ? self.controller.current_user_for_audit_log.id : nil,
         what: {id: model.id, event: :create},
         model_name: model.class.name,
         model_id: model.id
@@ -29,7 +29,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
     
     if self.controller.audited_model == model
       logged_model = LoggedModel.new(
-        who: self.controller.current_user_for_audit_log,
+        who: self.controller.current_user_for_audit_log ? self.controller.current_user_for_audit_log.id : nil,
         what: {id: model.id, event: :destroy},
         model_name: model.class.name,
         model_id: model.id
@@ -46,7 +46,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
         what = WhatBuilder.new(changes).build
         
         logged_model = LoggedModel.new(
-          who: self.controller.current_user_for_audit_log,
+          who: self.controller.current_user_for_audit_log ? self.controller.current_user_for_audit_log.id : nil,
           what: what,
           model_name: model.class.name,
           model_id: model.id
