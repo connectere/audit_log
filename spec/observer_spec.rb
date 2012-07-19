@@ -1,6 +1,16 @@
 require 'spec_helper'
 
+class MockController
+  include AuditLog::Controller
+  
+  def current_user_for_audit_log
+    nil
+  end
+end
+    
 describe AuditedModelsObserver do
+  
+  before(:all){ AuditedModelsObserver.instance.controller = MockController.new }
 
   describe ".observed_classes" do
     it "returns all mapped model class names" do

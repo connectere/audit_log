@@ -8,11 +8,11 @@ class AuditedModelsObserver < ActiveRecord::Observer
   
   
   def before_validation(model)
-    Thread.current[:auditing] ||= model
+    self.controller.audited_model ||= model
   end
 
   def after_create(model)
-    if Thread.current[:auditing] == model
+    if self.controller.audited_model == model
       logged_model = LoggedModel.new(
         who: self.controller.current_user_for_audit_log,
         what: {id: model.id, event: :create},
@@ -25,9 +25,9 @@ class AuditedModelsObserver < ActiveRecord::Observer
   
   
   def before_destroy(model)
-    Thread.current[:auditing] ||= model
+    self.controller.audited_model ||= model
     
-    if Thread.current[:auditing] == model
+    if self.controller.audited_model == model
       logged_model = LoggedModel.new(
         who: self.controller.current_user_for_audit_log,
         what: {id: model.id, event: :destroy},
@@ -39,7 +39,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
   end
   
   def after_update(model)
-    if Thread.current[:auditing] == model
+    if self.controller.audited_model == model
       changes = Thread.current[:audited_model_changes]
       
       if changes
@@ -57,7 +57,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
   end
   
   def before_update(model)
-    if Thread.current[:auditing] == model
+    if self.controller.audited_model == model
       if (model.changed? && !(model.changed_attributes.keys.collect{|attr| attr.to_sym}.uniq.sort - ignored_fields(model).uniq.sort).empty?) || 
           has_some_association_changed?(model)
         changes = {model: model, fields_updates: {}, has_many: {}, has_one: {}}
@@ -205,7 +205,7 @@ end
 
 require 'singleton'
 
-class Teste
+class ControllerInterceptor
   include Singleton
   
   def before(controller)
@@ -222,6 +222,6 @@ end
 
 if defined?(ActionController) and defined?(ActionController::Base)
   ActionController::Base.class_eval do
-    around_filter Teste.instance
+    around_filter ControllerInterceptor.instance
   end
 end
