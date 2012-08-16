@@ -8,7 +8,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
   
   
   def before_validation(model)
-    self.controller.audited_model ||= model if self.controller
+    set_model_to_audit(model)
   end
 
   def after_create(model)
@@ -25,7 +25,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
   
   
   def before_destroy(model)
-    self.controller.audited_model ||= model if self.controller 
+    set_model_to_audit(model)
     
     if self.controller && self.controller.audited_model == model
       logged_model = LoggedModel.new(
@@ -131,6 +131,12 @@ class AuditedModelsObserver < ActiveRecord::Observer
   
   private 
   
+  def set_model_to_audit(model)
+    if self.controller && self.controller.params[:controller].sub("Controller", "").underscore.split("/").last.singularize == model.class.to_s.underscore
+      self.controller.audited_model ||= model 
+    end  
+  end
+  
   def has_some_association_changed?(model)
     changed = false
         
@@ -209,6 +215,7 @@ class ControllerInterceptor
   include Singleton
   
   def before(controller)
+    controller.audited_model = nil
     AuditedModelsObserver.instance.controller = controller
     true
   end
