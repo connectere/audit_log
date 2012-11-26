@@ -28,13 +28,18 @@ class AuditedModelsObserver < ActiveRecord::Observer
     set_model_to_audit(model)
     
     if self.controller && self.controller.audited_model == model
+      what = {id: model.id, event: :destroy}
+      what = what.merge(ActiveSupport::JSON.decode(model.to_json(root: false, include: association_audit_loggers(model))))
+      
       logged_model = LoggedModel.new(
         who: self.controller.current_user_for_audit_log ? self.controller.current_user_for_audit_log.id : nil,
-        what: {id: model.id, event: :destroy},
+        what: what,
         model_name: model.class.name,
         model_id: model.id
       )    
       logged_model.save
+      
+      self.controller.audited_model = nil
     end
   end
   
@@ -53,6 +58,8 @@ class AuditedModelsObserver < ActiveRecord::Observer
         )    
         logged_model.save
       end
+      
+      self.controller.audited_model = nil
     end
   end
   
@@ -132,9 +139,16 @@ class AuditedModelsObserver < ActiveRecord::Observer
   private 
   
   def set_model_to_audit(model)
-    if self.controller && self.controller.params[:controller].sub("Controller", "").underscore.split("/").last.singularize == model.class.to_s.underscore
+    if self.controller && is_controller_mapped_to_model(model) 
       self.controller.audited_model ||= model 
     end  
+  end
+  
+  def is_controller_mapped_to_model(model)
+    controller_name = self.controller.params[:controller].sub("Controller", "").underscore.split("/").last
+    mapped_controller_names = AuditLog::Mapping.instance.audit_mappings[model.class.to_s.underscore.to_sym][:controllers]  
+    
+    mapped_controller_names.collect{|e| e.to_s.singularize}.include?(controller_name.to_s.singularize)
   end
   
   def has_some_association_changed?(model)

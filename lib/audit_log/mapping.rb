@@ -18,7 +18,8 @@ module AuditLog
     def audit(model_name, options = {})
       @audit_mappings[model_name] = {
         ignored_fields: options[:ignore] || [],
-        nested_audited_models: []
+        nested_audited_models: [],
+        controllers: options[:controllers] || [model_name]
       }  
       
       @current = @audit_mappings[model_name]
