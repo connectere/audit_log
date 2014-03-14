@@ -77,7 +77,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
         }  
         
         # build has_many model creations
-        association_audit_loggers(model).select{|association| model.send(association).kind_of?(Array)}.each{|method_name| 
+        association_audit_loggers(model).select{|association| model.send(association).kind_of?(ActiveRecord::Associations::CollectionProxy)}.each{|method_name| 
           changes[:has_many][method_name.to_sym] ||= []
           
           model.send(method_name).select{|a| a.new_record?}.each{|nested|
@@ -86,7 +86,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
         }
         
         # build has_many model updates
-        association_audit_loggers(model).select{|association| model.send(association).kind_of?(Array)}.each{|method_name| 
+        association_audit_loggers(model).select{|association| model.send(association).kind_of?(ActiveRecord::Associations::CollectionProxy)}.each{|method_name| 
           changes[:has_many][method_name.to_sym] ||= []
           
           model.send(method_name).select{|a| a.changed? && !a.new_record?}.each{|nested|
@@ -102,7 +102,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
         }
         
         # build has_many model deletions
-        association_audit_loggers(model).select{|association| model.send(association).kind_of?(Array)}.each{|method_name| 
+        association_audit_loggers(model).select{|association| model.send(association).kind_of?(ActiveRecord::Associations::CollectionProxy)}.each{|method_name| 
           changes[:has_many][method_name.to_sym] ||= []
           
           model.send(method_name).select{|a| a.marked_for_destruction?}.each{|nested|
@@ -112,7 +112,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
 
         
         # build has_one model creations
-        association_audit_loggers(model).select{|association| !model.send(association).kind_of?(Array) && !model.send(association).nil?}.each{|method_name| 
+        association_audit_loggers(model).select{|association| !model.send(association).kind_of?(ActiveRecord::Associations::CollectionProxy) && !model.send(association).nil?}.each{|method_name| 
           has_one_model = model.send(method_name)
           
           if has_one_model.new_record?
@@ -164,7 +164,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
   
   def association_has_changed?(association)
     # has_many
-    if association.kind_of?(Array)
+    if association.kind_of?(ActiveRecord::Associations::CollectionProxy)
       !association.select{|logger| logger.changed? && !logger.new_record?}.empty? ||
       !association.select{|logger| logger.new_record?}.empty? || 
       !association.select{|item| item.marked_for_destruction?}.empty?
