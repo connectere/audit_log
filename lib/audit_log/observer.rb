@@ -228,14 +228,13 @@ require 'singleton'
 class ControllerInterceptor
   include Singleton
   
-  def before(controller)
+  def around(controller)
     controller.audited_model = nil
     AuditedModelsObserver.instance.controller = controller
-    true
-  end
-  
-  def after(controller)
+    yield
     AuditedModelsObserver.instance.controller = nil
+    
+    true
   end
 end
 
