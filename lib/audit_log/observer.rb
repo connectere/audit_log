@@ -16,7 +16,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
       logged_model = LoggedModel.new(
         who: self.controller.current_user_for_audit_log ? self.controller.current_user_for_audit_log.id : nil,
         what: {id: model.id, event: :create},
-        model_name: model.class.name,
+        model_class_name: model.class.name,
         model_id: model.id
       )    
       logged_model.save
@@ -34,7 +34,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
       logged_model = LoggedModel.new(
         who: self.controller.current_user_for_audit_log ? self.controller.current_user_for_audit_log.id : nil,
         what: what,
-        model_name: model.class.name,
+        model_class_name: model.class.name,
         model_id: model.id
       )    
       logged_model.save
@@ -53,7 +53,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
         logged_model = LoggedModel.new(
           who: self.controller.current_user_for_audit_log ? self.controller.current_user_for_audit_log.id : nil,
           what: what,
-          model_name: model.class.name,
+          model_class_name: model.class.name,
           model_id: model.id
         )    
         logged_model.save

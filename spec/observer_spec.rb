@@ -38,7 +38,7 @@ describe AuditedModelsObserver do
         ) 
       end
 
-      its(:model_name) { should eq("AuditedModel") }
+      its(:model_class_name) { should eq("AuditedModel") }
       its(:model_id) { should eq(audited_model.id) }
     end
   end
@@ -62,7 +62,7 @@ describe AuditedModelsObserver do
         ) 
       end
 
-      its(:model_name) { should eq("AuditedModel") }
+      its(:model_class_name) { should eq("AuditedModel") }
       its(:model_id) { should eq(audited_model.id) }
     end
   end
@@ -95,7 +95,7 @@ describe AuditedModelsObserver do
           ) 
         end
         
-        its(:model_name) { should eq("AuditedModel") }
+        its(:model_class_name) { should eq("AuditedModel") }
         its(:model_id) { should eq(audited_model.id) }
       end
     end
@@ -126,7 +126,7 @@ describe AuditedModelsObserver do
           ) 
         end
         
-        its(:model_name) { should eq("AuditedModel") }
+        its(:model_class_name) { should eq("AuditedModel") }
         its(:model_id) { should eq(audited_model.id) }
       end
     end
@@ -160,7 +160,7 @@ describe AuditedModelsObserver do
           ) 
         end
         
-        its(:model_name) { should eq("AuditedModel") }
+        its(:model_class_name) { should eq("AuditedModel") }
         its(:model_id) { should eq(audited_model.id) }
       end
     end
@@ -193,7 +193,7 @@ describe AuditedModelsObserver do
           ) 
         end
         
-        its(:model_name) { should eq("AuditedModel") }
+        its(:model_class_name) { should eq("AuditedModel") }
         its(:model_id) { should eq(audited_model.id) }
       end
     end
@@ -244,7 +244,7 @@ describe AuditedModelsObserver do
               ) 
             end
             
-            its(:model_name) { should eq("AuditedModel") }
+            its(:model_class_name) { should eq("AuditedModel") }
             its(:model_id) { should eq(audited_model.id) }
           end
         end
@@ -274,7 +274,7 @@ describe AuditedModelsObserver do
               ) 
             end
             
-            its(:model_name) { should eq("AuditedModel") }
+            its(:model_class_name) { should eq("AuditedModel") }
             its(:model_id) { should eq(audited_model.id) }
           end
         end
@@ -302,7 +302,7 @@ describe AuditedModelsObserver do
               ) 
             end
             
-            its(:model_name) { should eq("AuditedModel") }
+            its(:model_class_name) { should eq("AuditedModel") }
             its(:model_id) { should eq(audited_model.id) }
           end
         end

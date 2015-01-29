@@ -32,7 +32,7 @@ ActiveRecord::Schema.define(:version => 20120714003030) do
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
     t.integer  "model_id"
-    t.string   "model_name"
+    t.string   "model_class_name"
     t.integer  "who"
   end
 
