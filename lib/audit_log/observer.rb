@@ -15,7 +15,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
     if self.controller && self.controller.audited_model == model
       logged_model = LoggedModel.new(
         who: self.controller.current_user_for_audit_log ? self.controller.current_user_for_audit_log.id : nil,
-        what: {id: model.id, event: :create},
+        what: YAML.dump({id: model.id, event: :create}),
         model_class_name: model.class.name,
         model_id: model.id
       )    
@@ -33,7 +33,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
       
       logged_model = LoggedModel.new(
         who: self.controller.current_user_for_audit_log ? self.controller.current_user_for_audit_log.id : nil,
-        what: what,
+        what: YAML.dump(what),
         model_class_name: model.class.name,
         model_id: model.id
       )    
@@ -52,7 +52,7 @@ class AuditedModelsObserver < ActiveRecord::Observer
         
         logged_model = LoggedModel.new(
           who: self.controller.current_user_for_audit_log ? self.controller.current_user_for_audit_log.id : nil,
-          what: what,
+          what: YAML.dump(what),
           model_class_name: model.class.name,
           model_id: model.id
         )    
